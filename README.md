@@ -1,0 +1,1 @@
+This is a personal stock simulator created by me, it needs to developed more and i know it. I am currently a begginer in python and tkinter so i have tried my best to do it and all new commits are welcomed
