@@ -22,41 +22,46 @@ class Login:
         self.username = username.get().strip().lower()
         self.password = password.get().strip().encode("utf-8")
         self.display_message(self.login_message_label, "")
-        try:
-            with open('User_data.json', 'r+') as user_data:
-                data = json.load(user_data)
-                if self.login == True and self.signin == False:
-                    for user in data:
-                        if user["username"] == self.username:
-                            if bcrypt.checkpw(self.password, user["password"].encode("utf-8")):
-                                self.display_message(self.login_message_label, "Login successful!", "green")
-                                window.destroy()
-                                self.authenticated_user = True
-                                return
-                            else:
-                                self.display_message(self.login_message_label, "Invalid password.")
-                                return
-                elif self.login == False and self.signin == True:
+        username_check = re.match(r"^[a-zA-Z0-9_]{1,30}$", self.username)
+        if username_check:
+            try:
+                with open('User_data.json', 'r+') as user_data:
+                    data = json.load(user_data)
+                    if self.login == True and self.signin == False:
                         for user in data:
                             if user["username"] == self.username:
-                                self.login_message_label.config(text = "username exists")
-                                return
-                        salt = bcrypt.gensalt()
-                        hashed_pass = bcrypt.hashpw(self.password, salt).decode("utf-8")
-                        new_entry = {"username": self.username, "password": hashed_pass}
-                        data.append(new_entry)
-                        user_data.seek(0)
-                        json.dump(data, user_data, indent=4)
-                        user_data.truncate()
-                        self.create_user_stock_file(self.username)
-                        self.display_message(self.login_message_label, "User added successfully!", "green")
-                        window.destroy()
-                        self.authenticated_user = True
-                        return
-        except FileNotFoundError:
-                self.display_message(self.login_message_label, "Server error")
-        except json.JSONDecodeError:
-                self.display_message(self.login_message_label, "Server error")
+                                if bcrypt.checkpw(self.password, user["password"].encode("utf-8")):
+                                    self.display_message(self.login_message_label, "Login successful!", "green")
+                                    window.destroy()
+                                    self.authenticated_user = True
+                                    return
+                                else:
+                                    self.display_message(self.login_message_label, "Invalid password.")
+                                    return
+                    elif self.login == False and self.signin == True:
+                            for user in data:
+                                if user["username"] == self.username:
+                                    self.login_message_label.config(text = "username exists")
+                                    return
+                            salt = bcrypt.gensalt()
+                            hashed_pass = bcrypt.hashpw(self.password, salt).decode("utf-8")
+                            new_entry = {"username": self.username, "password": hashed_pass}
+                            data.append(new_entry)
+                            user_data.seek(0)
+                            json.dump(data, user_data, indent=4)
+                            user_data.truncate()
+                            self.create_user_stock_file(self.username)
+                            self.display_message(self.login_message_label, "User added successfully!", "green")
+                            window.destroy()
+                            self.authenticated_user = True
+                            return
+            except FileNotFoundError:
+                    self.display_message(self.login_message_label, "Server error")
+            except json.JSONDecodeError:
+                    self.display_message(self.login_message_label, "Server error")
+        else:
+            self.login_message_label.config(text = "Enter only letters, numbers and  _")
+            return
 
     def create_user_stock_file(self, username):
         filename = f"{username}stock_data.csv"
