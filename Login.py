@@ -23,7 +23,7 @@ class Login:
         self.password = password.get().strip().encode("utf-8")
         self.display_message(self.login_message_label, "")
         username_check = re.match(r"^[a-zA-Z0-9_]{1,30}$", self.username)
-        password_check = re.match(r"^[^\"']*$", self.password)
+        password_check = re.match(r"^[^\"']*$", self.password.decode("utf-8"))
         if username_check and password_check:
             try:
                 with open('User_data.json', 'r+') as user_data:
